@@ -3,6 +3,7 @@ import random
 
 from player_base import Player
 from board import Board
+from game_manager import GameDifficulty
 
 
 class AIPlayer(Player):
@@ -14,7 +15,7 @@ class AIPlayer(Player):
         if choose_random_move:
             self.is_minimaxing = False
         self.max_move_look_ahead = 3
-        self.scaling = 14 # keep as a multiple of 2 ALWAYS!!!!!!!!!!!!!!!!!!!!!!!
+        self.scaling = 4 # keep as a multiple of 2 ALWAYS!!!!!!!!!!!!!!!!!!!!!!!
 
         self.testing_diagnostics = {
             "wins" : 0,
@@ -22,7 +23,7 @@ class AIPlayer(Player):
             "ties" : 0,
         }
 
-    def choose_move(self, board, move_input) -> tuple[int, int] | None:
+    def choose_move(self, board, move_input, difficulty) -> tuple[int, int] | None:
 
         if self.choose_random_move:
             moves = board.get_possible_moves()
@@ -30,8 +31,12 @@ class AIPlayer(Player):
             return random_move
         else:
             best_move = self.find_best_move(board)
-            if board.moves % self.scaling == 1:
-                self.max_move_look_ahead += 1
+            if difficulty == "HARD":
+                if board.moves % self.scaling == 1:
+                    self.max_move_look_ahead += 1
+            else:
+                self.max_move_look_ahead = 3
+
             return best_move
 
 
@@ -41,6 +46,8 @@ class AIPlayer(Player):
         possible_moves = board.get_possible_moves()
 
         opponent_identifier = self.get_other_player_identifier()
+
+        print(self.max_move_look_ahead)
 
 
         if len(possible_moves) == 0:
@@ -64,7 +71,6 @@ class AIPlayer(Player):
             board_copy.apply_move(move, self.identifier)
 
             position = board.get_position(move)
-            print(position)
 
             score = self.minimax(board_copy, 0, is_maximizing=False, opponent_identifier=opponent_identifier, alpha=float("-inf"), beta=float("inf"))
 
@@ -78,7 +84,7 @@ class AIPlayer(Player):
 
             if score > max_score:
 
-                if max_score > float("-inf"): 
+                if max_score > float("-inf"):
                     non_zero_score_change = True
 
                 max_score = score
@@ -102,6 +108,7 @@ class AIPlayer(Player):
 
         if depth >= self.max_move_look_ahead:
             return 0
+            # return self.score_position(board.game_board, self.identifier)
 
 
         return None
@@ -156,6 +163,18 @@ class AIPlayer(Player):
                     break
 
             return min_score
+
+    def score_position(self, board, identifier):
+        values = [2, 3, 4, 5, 4, 3, 2]
+        highest_value = 2
+        print(board)
+        for row, col in board:
+            if board[row][col] == identifier:
+                if values[col] > highest_value:
+                    highest_value = values[col]
+
+        return highest_value
+
 
 
     def update_testing_diagnostics(self, last_game_result):

@@ -1,19 +1,27 @@
 ########################################################################################################################
 ###                                            ML RL Tic-Tac-Toe                                                     ###
 ########################################################################################################################
+
+"""
+MVHS CS Authorship Authenticity Statement:
+I affirm that all code in this submission was written by me.
+AI tools, if used, were used only for concept explanations, debugging interpretation, or syntax clarification.
+No AI-generated or AI-modified code was used.
+I understand that submitting false authorship statement is an academic integrity violation.
+"""
 from collections.abc import Sequence
 from enum import Enum
 import pygame
 from pygame import mouse
 
 import constants
-from tile import *
-from ai_player import AIPlayer
-from constants import AI_TESTING_GAMES
-from game_manager import GameManager, GameState
-from human_player import HumanPlayer
+from src.tile import *
+from src.ai_player import AIPlayer
+from src.constants import AI_TESTING_GAMES
+from src.game_manager import GameManager, GameState, GameDifficulty
+from src.human_player import HumanPlayer
 
-from utilities import load_image, draw_image, draw_polygon, draw_rect_center, draw_ellipse_centered, draw_text, \
+from src.utilities import load_image, draw_image, draw_polygon, draw_rect_center, draw_ellipse_centered, draw_text, \
     play_music, play_sfx, draw_button
 
 pygame.init()
@@ -25,9 +33,6 @@ pygame.display.set_caption('ConnectQuatro')
 # TODO: add total moves played
 # TODO: improve ai by doing better pruning
 # TODO: add start screen, difficulty
-
-
-
 
 # region Global Gameplay Variables -------------------------------------------------------------------------------------
 
@@ -83,7 +88,6 @@ player_move_input = None
 reset_button = None
 
 tiles = []
-display_intro = True
 
 # endregion ------------------------------------------------------------------------------------------------------------
 
@@ -94,8 +98,7 @@ def animate() -> None:
     # Update game state via game manager
     game_manager.update(player_move_input)
     if player_move_input is not None:
-        pass
-        #game_manager.animate_minimax()
+        game_manager.animate_minimax()
     # Clear any human player inputs that were applied this frame
     player_move_input = None
 
@@ -107,16 +110,20 @@ def animate() -> None:
 
 
 def paint() -> None:
-    draw_game_board()
-    draw_player_moves()
-    if game_manager.game_state == GameState.PLAYING:
-        if game_manager.is_player_one_turn():
-            draw_player_one_turn()
-        else:
-            draw_player_two_turn()
-    elif game_manager.game_state == GameState.GAME_OVER:
-        draw_winner()
-    draw_reset_button()
+    if game_manager.game_state == GameState.INTRO:
+        draw_intro()
+    else:
+        draw_game_board()
+        draw_player_moves()
+        if game_manager.game_state == GameState.PLAYING:
+            if game_manager.is_player_one_turn():
+                draw_player_one_turn()
+            else:
+                draw_player_two_turn()
+        elif game_manager.game_state == GameState.GAME_OVER:
+            draw_winner()
+            draw_reset_button()
+
 
 
 
@@ -124,15 +131,20 @@ def paint() -> None:
 
 def draw_intro() -> None:
 
-    #Select game difficulty
-    #play button
-    #draw_rect_center(window, (int(constants.WINDOW_WIDTH/4), int(constants.WINDOW_HEIGHT/4)),(200, 100), (255, 255, 255))
-    #draw_text(window, "Easy", 25, constants.PLAYER_2_COLOR, (int(constants.WINDOW_WIDTH/4), int(constants.WINDOW_HEIGHT/4)))
+    draw_text(window, "Select difficulty", 50, constants.COLOR_WHITE, (int(constants.WINDOW_WIDTH/2), 100))
+    draw_rect_center(window, (int(constants.WINDOW_WIDTH/4), int(constants.WINDOW_HEIGHT/4)),(200, 100), (255, 255, 255))
+    draw_text(window, "Easy", 25, constants.PLAYER_2_COLOR, (int(constants.WINDOW_WIDTH/4), int(constants.WINDOW_HEIGHT/4)))
 
+    draw_rect_center(window, (int(3*constants.WINDOW_WIDTH /4), int(constants.WINDOW_HEIGHT / 4)), (200, 100), (255, 255, 255))
+    draw_text(window, "HARD", 25, constants.PLAYER_1_COLOR, (int(3*constants.WINDOW_WIDTH/4), int(constants.WINDOW_HEIGHT/4)))
 
-    #draw_rect_center(window, (int(3*constants.WINDOW_WIDTH /4), int(constants.WINDOW_HEIGHT / 4)), (200, 100), (255, 255, 255))
-    #draw_text(window, "HARD", 25, constants.PLAYER_1_COLOR, (int(3*constants.WINDOW_WIDTH/4), int(constants.WINDOW_HEIGHT/4)))
-    pass
+    global easy_button
+    easy_button = draw_button(window, "EASY", (int(constants.WINDOW_WIDTH/4), int(constants.WINDOW_HEIGHT/2)), 20,
+                               constants.COLOR_RED, constants.COLOR_GREEN)
+    global hard_button
+    hard_button = draw_button(window, "HARD", (int(3*constants.WINDOW_WIDTH /4), int(constants.WINDOW_HEIGHT //2)), 20,
+                               constants.COLOR_RED, constants.COLOR_GREEN)
+
 
 def draw_game_board() -> None:
 
@@ -222,6 +234,13 @@ def process_mouse_event(event: pygame.event.Event) -> None:
         elif game_manager.game_state == GameState.PLAYING:
             x_pos, y_pos = mouse.get_pos()
             player_move_input = x_pos, y_pos
+        if game_manager.game_state == GameState.INTRO:
+            if easy_button is not None and easy_button.collidepoint(event.pos):
+                game_manager.game_state = GameState.PLAYING
+                game_manager.difficulty = GameDifficulty.EASY
+            elif hard_button is not None and hard_button.collidepoint(event.pos):
+                game_manager.game_state = GameState.PLAYING
+                game_manager.difficulty = "HARD"
 
 
 def process_key_event(event: pygame.event.Event) -> None:

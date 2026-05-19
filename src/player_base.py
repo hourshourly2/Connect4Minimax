@@ -4,7 +4,7 @@ player_base.py
 
 Base class for AI and human players.
 """
-import constants
+from src import constants
 
 
 class Player:
@@ -31,7 +31,7 @@ class Player:
             return constants.PLAYER_1_IDENTIFIER
 
 
-    def choose_move(self, board, move_input):
+    def choose_move(self, board, move_input, difficulty):
 
         """
         Choose a move to apply to the board.

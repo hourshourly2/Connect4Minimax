@@ -1,4 +1,4 @@
-from board import Board
+from src.board import Board
 from enum import Enum
 
 
@@ -27,6 +27,12 @@ class GameState(Enum):
     PLAYING = 0     # game is active, moves are still being applied
     GAME_OVER = 1   # a player has won the game, or game ended in a tie
     RESET = 2       # waiting to reset (waiting to start a new game)
+    INTRO = 3
+
+class GameDifficulty(Enum):
+    EASY = 0
+    HARD = 1
+
 
 
 class GameManager:
@@ -39,8 +45,9 @@ class GameManager:
         self.player2 = player2
 
         self.current_player = self.player1
-        self.game_state = GameState.PLAYING
+        self.game_state = GameState.INTRO
         self.training_identifier = 2
+        self.difficulty = GameDifficulty.EASY
 
 
     def animate_minimax(self):
@@ -71,7 +78,7 @@ class GameManager:
         if self.game_state != GameState.PLAYING:
             return
 
-        chosen_move = self.current_player.choose_move(self.board, pending_move)
+        chosen_move = self.current_player.choose_move(self.board, pending_move, self.difficulty)
 
         if self.board.apply_move(chosen_move, self.current_player.identifier):
 

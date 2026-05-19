@@ -19,7 +19,7 @@ class HumanPlayer(Player):
         self.is_minimaxing = False
 
 
-    def choose_move(self, board, move_input) -> int|None:
+    def choose_move(self, board, move_input, difficulty) -> int|None:
 
         """
         Convert move_input (mouse click in pixels) into a board move (row, col).

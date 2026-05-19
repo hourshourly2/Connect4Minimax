@@ -2,8 +2,8 @@
 
 import numpy as np
 import time
-import constants
-from tile import Tile
+from src import constants
+from src.tile import Tile
 
 """
 Board is the rules and state for a turn-based game.
@@ -59,7 +59,7 @@ class Board:
             position = self.get_position(col)
 
             self.game_board[position[0]][position[1]] = 12 + 5
-            time.sleep(0.5)
+            yield time.sleep(4)
 
 
     def reset(self):
