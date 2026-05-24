@@ -1,14 +1,7 @@
 ########################################################################################################################
-###                                            ML RL Tic-Tac-Toe                                                     ###
+###                                            ML RL Connect-4                                                       ###
 ########################################################################################################################
 
-"""
-MVHS CS Authorship Authenticity Statement:
-I affirm that all code in this submission was written by me.
-AI tools, if used, were used only for concept explanations, debugging interpretation, or syntax clarification.
-No AI-generated or AI-modified code was used.
-I understand that submitting false authorship statement is an academic integrity violation.
-"""
 from collections.abc import Sequence
 from enum import Enum
 import pygame
@@ -149,7 +142,7 @@ def draw_intro() -> None:
 def draw_game_board() -> None:
 
     """
-    Draws the empty Tic-Tac-Toe game board. (two vertical and two horizontal lines)
+    Draws the empty Connect 4 game board. (two vertical and two horizontal lines)
     """
 
     first_cell_center_x = constants.BOARD_CENTER_X - (constants.NUM_COLS // 2 * constants.CELL_SIZE)
