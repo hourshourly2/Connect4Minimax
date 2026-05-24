@@ -2,3 +2,4 @@ pygame
 numpy
 pathlib
 enum
+python3=3.12
